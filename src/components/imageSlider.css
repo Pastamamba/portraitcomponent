@@ -1,0 +1,105 @@
+/* Style to hide the scrollbar for various browsers */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none; /* for Internet Explorer and Edge */
+    scrollbar-width: none;    /* for modern browsers */
+}
+
+/* Style for the slider content container */
+.slider-content {
+    max-height: calc(100vh - 80px);
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Styling for custom scrollbar on the slider content container */
+.slider-content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.slider-content::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    border-radius: 10px;
+}
+
+/* Style to add white shadow border to active images */
+.shadow-border-active {
+    box-shadow: 0 0 0 2px white;
+    border-radius: 0.5em;
+}
+
+/* Basic styling for all thumbnail images */
+.thumbnail-image {
+    height: 100px;
+    width: 100px;
+    object-fit: cover;
+    pointer-events: none; /* Disallow interaction with the image */
+}
+
+/* Style for faded out thumbnail images */
+.thumbnail-image.fade-out {
+    opacity: 0;
+}
+
+/* Style for the large, main display image */
+.large-image {
+    height: calc(100vh - 80px - 300px);
+    object-fit: cover;
+    pointer-events: none;
+}
+
+/* Ensures users can't select (highlight) the content in the slider */
+.image-slider-body {
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Internet Explorer/Edge */
+}
+
+/* Responsive styles for screens with a max width of 1400px */
+@media (max-width: 1400px) {
+    /* Adjusts the layout of the image slider body for smaller screens */
+    .image-slider-body {
+        flex-direction: column;
+    }
+
+    /* Makes the container for the large image span the full width */
+    .large-image-div {
+        width: 100%;
+    }
+
+    /* Adjustments for the slider content to align thumbnails horizontally */
+    .slider-content {
+        flex-direction: row;
+        height: 202px;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        white-space: nowrap; /* Prevents line breaks between inline elements */
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+    }
+
+    /* Display the thumbnail images inline and add spacing between them */
+    .thumbnail-image {
+        display: inline-block;
+        margin-right: 16px;
+    }
+
+    .image-counter {
+        height: 10px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .image-counter > div {
+        width: fit-content;
+        margin: auto;
+    }
+}
