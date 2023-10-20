@@ -1,149 +1,182 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from "react";
 import "./imageSlider.css";
+import { ImageData, ImageSliderProps } from "../utils/utils";
+import Thumbnails from "./Thumbnails";
+import ImageCounter from "./ImageCounter";
+import MainImage from "./MainImage";
+import Sections from "./Sections";
+import useAnimations from "./hooks/useAnimations";
 
-// Define the structure of an image data
-interface ImageData {
-    id: number;
-    imageUrl: string;
-    photographer: string;
-    category: string;
-}
+const ImageSlider: React.FC<ImageSliderProps> = ({
+  images,
+  sections,
+  onSectionClick,
+}) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const VISIBLE_THUMBNAILS = 9;
+  const HALF_VISIBLE_THUMBNAILS = Math.floor(VISIBLE_THUMBNAILS / 2);
 
-// Define the props for the ImageSlider component
-interface ImageSliderProps {
-    images: ImageData[];
-}
+  const [isDragging, setIsDragging] = useState(false);
+  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+  const [isAnimationCompleted, setAnimationCompleted] = useState(false);
 
-const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
-    const [activeIndex, setActiveIndex] = useState(0);
-    const VISIBLE_THUMBNAILS = 9;
-    const HALF_VISIBLE_THUMBNAILS = Math.floor(VISIBLE_THUMBNAILS / 2);
+  // References to the DOM elements for animations and interactions
+  const mainImageRef = useRef<HTMLImageElement>(null);
+  const thumbnailsRef = useRef<HTMLDivElement>(null);
+  const counterRef = useRef<HTMLDivElement>(null);
+  const counterNumberRef = useRef<HTMLDivElement>(null);
 
-    // States to handle the drag functionality
-    const [isDragging, setIsDragging] = useState(false);
-    const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+  useAnimations({
+    images,
+    mainImageRef,
+    thumbnailsRef,
+    counterRef,
+    counterNumberRef,
+    setAnimationCompleted,
+    activeIndex,
+  });
 
-    // Handle when mouse is pressed down, initializing the drag
-    const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-        setIsDragging(true);
-        setStartPosition({
-            x: event.clientX,
-            y: event.clientY
-        });
-    };
+  /**
+   * Initiates the drag state and sets the starting position when the mouse is pressed.
+   */
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    setStartPosition({ x: event.clientX, y: event.clientY });
+  };
 
-    // Handle when mouse is released, ending the drag
-    const handleMouseUp = () => {
-        setIsDragging(false);
-    };
+  /**
+   * Resets the drag state when the mouse is released.
+   */
+  const handleMouseUp = () => setIsDragging(false);
 
-    // Handle the dragging motion to navigate the slider
-    const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-        if (!isDragging) return;
+  /**
+   * Handles the dragging movement, calculating the new active image index based on the movement.
+   */
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
 
-        // Distinguish between horizontal and vertical drags based on window width
-        if(window.innerWidth < 1400) {
-            const currentX = event.clientX;
-            const diffX = startPosition.x - currentX;
-            const skipCountX = Math.round(diffX / 116); // assuming thumbnail width of 100px + 16px margin
+    const current = window.innerWidth < 1400 ? event.clientX : event.clientY;
+    const diff = startPosition.x - current;
+    const skipCount =
+      window.innerWidth < 1400
+        ? Math.round(diff / 116)
+        : Math.round(diff / 100);
 
-            if (skipCountX) {
-                const newIndex = (activeIndex + skipCountX) % images.length;
-                setActiveIndex(newIndex < 0 ? images.length + newIndex : newIndex);
-                setStartPosition(prev => ({ ...prev, x: currentX }));
-            }
-        } else {
-            const currentY = event.clientY;
-            const diffY = startPosition.y - currentY;
-            const skipCountY = Math.round(diffY / 100); // assuming thumbnail height of 100px
-
-            if (skipCountY) {
-                const newIndex = (activeIndex + skipCountY) % images.length;
-                setActiveIndex(newIndex < 0 ? images.length + newIndex : newIndex);
-                setStartPosition(prev => ({ ...prev, y: currentY }));
-            }
-        }
-    };
-
-    // Handle when mouse leaves the drag area
-    const handleMouseLeave = () => {
-        setIsDragging(false);
-    };
-
-    // Get visible thumbnails based on the active index
-    const getVisibleImages = (index: number): ImageData[] => {
-        const start = index - HALF_VISIBLE_THUMBNAILS;
-        return Array.from({ length: VISIBLE_THUMBNAILS }, (_, i) =>
-            images[(start + i + images.length) % images.length]
-        );
+    if (skipCount) {
+      const newIndex = (activeIndex + skipCount) % images.length;
+      setActiveIndex(newIndex < 0 ? images.length + newIndex : newIndex);
+      setStartPosition((prev) => ({ ...prev, x: current }));
     }
+  };
 
-    const [visibleImages, setVisibleImages] = useState(getVisibleImages(activeIndex));
+  /**
+   * Resets the drag state when the mouse leaves the container.
+   */
+  const handleMouseLeave = () => setIsDragging(false);
 
-    // Handle scroll events to navigate the slider
-    const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
-        const newIndex = (event.deltaY > 0)
-            ? (activeIndex + 1) % images.length
-            : (activeIndex - 1 + images.length) % images.length;
-        setActiveIndex(newIndex);
-    };
+  /**
+   * Initiates the drag state and sets the starting position when touch starts.
+   */
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    setStartPosition({
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY,
+    });
+  };
 
-    // Update visible thumbnails when active index changes
-    useEffect(() => {
-        setVisibleImages(getVisibleImages(activeIndex));
-    }, [activeIndex]);
+  /**
+   * Resets the drag state when touch ends.
+   */
+  const handleTouchEnd = () => setIsDragging(false);
 
-    // Determine the CSS class for a thumbnail
-    const getThumbnailClassName = (image: ImageData) => {
-        const baseClass = "m-2 hover:opacity-75 object-contain max-w-100px thumbnail-image";
-        return image.id === images[activeIndex].id
-            ? `${baseClass} mb-4 mt-4 shadow-border-active thumbnail-image`
-            : baseClass;
-    };
+  /**
+   * Same as handleMouseMove, but for touch events.
+   */
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
 
-    return (
-        <div
-            className="flex md:flex-row flex-col image-slider-body"
-            onWheel={handleScroll}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-        >
-            {/* Left Section (Header) */}
-            <div className="w-1/5 md:w-1/4 text-white p-4 hidden md:block">
-                <h2>Section Title</h2>
-            </div>
+    const current =
+      window.innerWidth < 1400
+        ? event.touches[0].clientX
+        : event.touches[0].clientY;
+    const diff = startPosition.x - current;
+    const skipCount =
+      window.innerWidth < 1400
+        ? Math.round(diff / 116)
+        : Math.round(diff / 100);
 
-            {/* Main Image Display */}
-            <div className="flex justify-center items-center w-full md:w-3/5 p-4 large-image-div">
-                <img
-                    src={images[activeIndex].imageUrl}
-                    alt={images[activeIndex].category}
-                    className={`transition-opacity duration-500 ease-in-out max-w-2xl md:max-w-3/4 large-image`}
-                />
-            </div>
+    if (skipCount) {
+      const newIndex = (activeIndex + skipCount) % images.length;
+      setActiveIndex(newIndex < 0 ? images.length + newIndex : newIndex);
+      setStartPosition((prev) => ({ ...prev, x: current }));
+    }
+  };
 
-            {/* Image counter */}
-            <div className="hidden md:flex md:w-1/6 justify-center items-center image-counter">
-                <div className="mt-4 text-white p-2 rounded-md">
-                    {activeIndex + 1} of {images.length}
-                </div>
-            </div>
-
-            {/* Thumbnails Display */}
-            <div className="md:w-1/5 p-4 flex md:flex-col flex-row items-center overflow-x-hidden md:overflow-y-hidden hide-scrollbar slider-content max-w-100">
-                {visibleImages.map((image) => (
-                    <img
-                        key={image.id}
-                        src={image.imageUrl}
-                        alt={image.category}
-                        className={getThumbnailClassName(image)}
-                    />
-                ))}
-            </div>
-        </div>
+  /**
+   * Returns a subset of images centered around the given index, for displaying as visible thumbnails.
+   */
+  const getVisibleImages = (index: number): ImageData[] => {
+    const start = index - HALF_VISIBLE_THUMBNAILS;
+    return Array.from(
+      { length: VISIBLE_THUMBNAILS },
+      (_, i) => images[(start + i + images.length) % images.length]
     );
-}
+  };
+
+  const [visibleImages, setVisibleImages] = useState(
+    getVisibleImages(activeIndex)
+  );
+
+  /**
+   * Handles the change in active image index based on the scroll direction.
+   */
+  const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
+    if (!isAnimationCompleted) return;
+    let newIndex =
+      event.deltaY > 0
+        ? (activeIndex + 1) % images.length
+        : (activeIndex - 1) % images.length;
+    if (newIndex < 0) {
+      newIndex = images.length - 1;
+    }
+    setActiveIndex(newIndex);
+  };
+
+  /**
+   * Updates the set of visible images whenever the active index changes.
+   */
+  useEffect(() => {
+    setVisibleImages(getVisibleImages(activeIndex));
+  }, [activeIndex]);
+
+  return (
+    <div
+      className="flex md:flex-row flex-col image-slider-body"
+      onWheel={handleScroll}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchMove={handleTouchMove}
+    >
+      <Sections sections={sections} onSectionClick={onSectionClick} />
+      <MainImage mainImageRef={mainImageRef} image={images[activeIndex]} />
+      <ImageCounter
+        counterRef={counterRef}
+        counterNumberRef={counterNumberRef}
+        activeIndex={activeIndex}
+        totalImages={images.length}
+      />
+      <Thumbnails
+        thumbnailsRef={thumbnailsRef}
+        visibleImages={visibleImages}
+        activeImage={images[activeIndex]}
+      />
+    </div>
+  );
+};
 
 export default ImageSlider;

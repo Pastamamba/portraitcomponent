@@ -1,105 +1,172 @@
-/* Style to hide the scrollbar for various browsers */
+/* Global styles for hiding the scrollbar across various browsers */
 .hide-scrollbar::-webkit-scrollbar {
-    display: none;
+  display: none; /* Chrome and Safari */
 }
 
 .hide-scrollbar {
-    -ms-overflow-style: none; /* for Internet Explorer and Edge */
-    scrollbar-width: none;    /* for modern browsers */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
-/* Style for the slider content container */
+/* Fixed width for the current image index display */
+.counter-index {
+  width: 35px;
+}
+
+/* Styling for the main content container of the image slider */
 .slider-content {
-    max-height: calc(100vh - 80px);
-    overflow-y: scroll;
-    scrollbar-width: thin;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  max-height: calc(100vh - 80px);
+  overflow-y: scroll; /* Allow vertical scroll */
+  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-/* Styling for custom scrollbar on the slider content container */
+/* Minimum width specification for section titles */
+.section-title {
+  min-width: 300px;
+}
+
+/* Specific font styling for h2 tags under .section-title */
+.section-title h2 {
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 110%;
+  color: #fff;
+  margin: 0.5em;
+}
+
+/* Custom scrollbar styling for .slider-content in Webkit browsers (like Chrome and Safari) */
 .slider-content::-webkit-scrollbar {
-    width: 5px;
+  width: 5px;
 }
 
 .slider-content::-webkit-scrollbar-thumb {
-    background-color: darkgrey;
-    border-radius: 10px;
+  background-color: darkgrey;
+  border-radius: 10px;
 }
 
-/* Style to add white shadow border to active images */
+/* Styling to add a white shadow border around active images */
 .shadow-border-active {
-    box-shadow: 0 0 0 2px white;
-    border-radius: 0.5em;
+  box-shadow: 0 0 0 2px white;
+  border-radius: 0.5em;
 }
 
-/* Basic styling for all thumbnail images */
+/* Default styling for the thumbnail images */
 .thumbnail-image {
-    height: 100px;
-    width: 100px;
-    object-fit: cover;
-    pointer-events: none; /* Disallow interaction with the image */
+  height: 100px;
+  width: 100px;
+  object-fit: cover;
+  pointer-events: none; /* Prevents mouse interactions with the image */
+  flex-shrink: 0; /* Ensures the image does not shrink */
 }
 
-/* Style for faded out thumbnail images */
+/* Styling for thumbnails that are fading out */
 .thumbnail-image.fade-out {
-    opacity: 0;
+  opacity: 0;
 }
 
-/* Style for the large, main display image */
+/* Styling for the primary displayed image in the slider */
 .large-image {
-    height: calc(100vh - 80px - 300px);
-    object-fit: cover;
-    pointer-events: none;
+  height: calc(100vh - 80px - 300px);
+  object-fit: cover;
+  pointer-events: none;
+  opacity: 0.1;
+  transform: scale(0.2); /* Initially scales down the image */
 }
 
-/* Ensures users can't select (highlight) the content in the slider */
+/* Default opacity for image counter */
+.image-counter {
+  opacity: 0.1;
+  width: 100px;
+}
+
+/* Prevents user from selecting content within the slider, enhancing UX */
 .image-slider-body {
-    user-select: none;
-    -webkit-user-select: none; /* Safari */
-    -moz-user-select: none;    /* Firefox */
-    -ms-user-select: none;     /* Internet Explorer/Edge */
+  user-select: none;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE/Edge */
 }
 
-/* Responsive styles for screens with a max width of 1400px */
+/* Fade-in animation for elements sliding from the bottom to their natural position */
+@keyframes slideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(150px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-fade-in {
+  animation: slideFadeIn 1s forwards;
+}
+
+/* Responsive styles to adjust the layout for various screen sizes */
+
 @media (max-width: 1400px) {
-    /* Adjusts the layout of the image slider body for smaller screens */
-    .image-slider-body {
-        flex-direction: column;
-    }
+  .image-slider-body {
+    flex-direction: column;
+  }
 
-    /* Makes the container for the large image span the full width */
-    .large-image-div {
-        width: 100%;
-    }
+  .large-image-div {
+    width: 100%;
+  }
 
-    /* Adjustments for the slider content to align thumbnails horizontally */
-    .slider-content {
-        flex-direction: row;
-        height: 202px;
-        overflow-x: scroll;
-        overflow-y: hidden;
-        white-space: nowrap; /* Prevents line breaks between inline elements */
-        margin-left: auto;
-        margin-right: auto;
-        width: 100%;
-    }
+  .slider-content {
+    flex-direction: row;
+    height: 167px;
+    overflow-x: scroll; /* Enable horizontal scrolling */
+    overflow-y: hidden;
+    white-space: nowrap;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
 
-    /* Display the thumbnail images inline and add spacing between them */
-    .thumbnail-image {
-        display: inline-block;
-        margin-right: 16px;
-    }
+  .thumbnail-image {
+    display: inline-block;
+    margin-right: 16px;
+  }
 
-    .image-counter {
-        height: 10px;
-        width: 100%;
-        justify-content: center;
-    }
+  .image-counter {
+    height: 10px;
+    width: 100%;
+    justify-content: center;
+  }
 
-    .image-counter > div {
-        width: fit-content;
-        margin: auto;
-    }
+  .image-counter > div {
+    width: fit-content;
+    margin: auto;
+  }
+}
+
+/* Further adjustments for smaller screen widths */
+@media (max-width: 700px) {
+  .large-image {
+    max-height: 585px;
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 570px) {
+  .large-image-div {
+    max-width: 100%;
+  }
+  .large-image {
+    max-height: 600px;
+  }
+}
+
+@media (max-width: 450px) {
+  .large-image {
+    max-height: 500px;
+    max-width: 300px;
+  }
 }

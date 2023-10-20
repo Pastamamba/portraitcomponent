@@ -1,98 +1,197 @@
 export const mockData = [
-    {
-        id: 1,
-        imageUrl: "./images/firstSet/img.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 2,
-        imageUrl: "./images/firstSet/img_1.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 3,
-        imageUrl: "./images/firstSet/img_3.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 4,
-        imageUrl: "./images/firstSet/img_4.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 5,
-        imageUrl: "./images/firstSet/img_5.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 6,
-        imageUrl: "./images/firstSet/img_6.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 7,
-        imageUrl: "./images/firstSet/img_7.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 8,
-        imageUrl: "./images/firstSet/img_8.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 9,
-        imageUrl: "./images/firstSet/img_9.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 10,
-        imageUrl: "./images/firstSet/img_10.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 11,
-        imageUrl: "./images/firstSet/img_11.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 12,
-        imageUrl: "./images/firstSet/img_12.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 13,
-        imageUrl: "./images/firstSet/img_13.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 14,
-        imageUrl: "./images/firstSet/img_14.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 15,
-        imageUrl: "./images/firstSet/img_15.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
-    {
-        id: 16,
-        imageUrl: "./images/firstSet/img_16.png",
-        photographer: "Petri",
-        category: "Portraits"
-    },
+  {
+    id: 1,
+    imageUrl: "./images/firstSet/img.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 2,
+    imageUrl: "./images/firstSet/img_1.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 3,
+    imageUrl: "./images/firstSet/img_3.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 4,
+    imageUrl: "./images/firstSet/img_4.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 5,
+    imageUrl: "./images/firstSet/img_5.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 6,
+    imageUrl: "./images/firstSet/img_6.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 7,
+    imageUrl: "./images/firstSet/img_7.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 8,
+    imageUrl: "./images/firstSet/img_8.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 9,
+    imageUrl: "./images/firstSet/img_9.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 10,
+    imageUrl: "./images/firstSet/img_10.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 11,
+    imageUrl: "./images/firstSet/img_11.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 12,
+    imageUrl: "./images/firstSet/img_12.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 13,
+    imageUrl: "./images/firstSet/img_13.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 14,
+    imageUrl: "./images/firstSet/img_14.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 15,
+    imageUrl: "./images/firstSet/img_15.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 16,
+    imageUrl: "./images/firstSet/img_16.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+];
+
+export const mockData1 = [
+  {
+    id: 17,
+    imageUrl: "./images/secondSet/img.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 18,
+    imageUrl: "./images/secondSet/img_1.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 19,
+    imageUrl: "./images/secondSet/img_2.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 20,
+    imageUrl: "./images/secondSet/img_3.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 21,
+    imageUrl: "./images/secondSet/img_6.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 22,
+    imageUrl: "./images/secondSet/img_7.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 23,
+    imageUrl: "./images/secondSet/img_6.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 24,
+    imageUrl: "./images/secondSet/img_7.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 25,
+    imageUrl: "./images/secondSet/img_8.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 26,
+    imageUrl: "./images/secondSet/img_9.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 27,
+    imageUrl: "./images/secondSet/img_10.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 28,
+    imageUrl: "./images/secondSet/img_10.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 29,
+    imageUrl: "./images/secondSet/img_10.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 30,
+    imageUrl: "./images/secondSet/img_10.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 31,
+    imageUrl: "./images/secondSet/img_10.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
+  {
+    id: 32,
+    imageUrl: "./images/secondSet/img_10.png",
+    photographer: "Petri",
+    category: "Portraits",
+  },
 ];
