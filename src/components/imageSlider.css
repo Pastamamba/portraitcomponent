@@ -62,6 +62,7 @@
   object-fit: cover;
   pointer-events: none; /* Prevents mouse interactions with the image */
   flex-shrink: 0; /* Ensures the image does not shrink */
+  transition: box-shadow 0.3s ease;
 }
 
 /* Styling for thumbnails that are fading out */
@@ -92,23 +93,23 @@
   -ms-user-select: none; /* IE/Edge */
 }
 
-/* Fade-in animation for elements sliding from the bottom to their natural position */
-@keyframes slideFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(150px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.slide-fade-in {
-  animation: slideFadeIn 1s forwards;
-}
-
 /* Responsive styles to adjust the layout for various screen sizes */
+
+.slider-content::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 55%;
+  left: 87%;
+  right: 4.9%;
+  height: 123px; /* thumbnail height + some margin for the border */
+  border: 2px solid white;
+  border-radius: 1em;
+  box-sizing: border-box;
+  pointer-events: none; /* Ensures no interactions */
+  z-index: 1; /* Keep it above the thumbnails */
+  transform: translateY(-50%);
+}
 
 @media (max-width: 1400px) {
   .image-slider-body {
@@ -122,12 +123,24 @@
   .slider-content {
     flex-direction: row;
     height: 167px;
+    position: relative;
     overflow-x: scroll; /* Enable horizontal scrolling */
     overflow-y: hidden;
     white-space: nowrap;
     margin-left: auto;
     margin-right: auto;
     width: 100%;
+  }
+
+  .slider-content::before {
+    position: absolute;
+    top: 147px;
+    left: 0;
+    right: 8px;
+    bottom: 30px;
+    height: 125px;
+    width: 125px;
+    margin: auto;
   }
 
   .thumbnail-image {
@@ -168,5 +181,83 @@
   .large-image {
     max-height: 500px;
     max-width: 300px;
+  }
+}
+
+.thumbnail-entering-down {
+  animation: slideFromBottom 0.5s forwards;
+}
+
+.thumbnail-entering-up {
+  animation: slideFromTop 0.5s forwards;
+}
+
+.thumbnail-exiting-down {
+  animation: slideToTop 0.5s forwards;
+}
+
+.thumbnail-exiting-up {
+  animation: slideToBottom 0.5s forwards;
+}
+
+.thumbnail-entering-left {
+  animation: slideFromLeft 0.5s forwards;
+}
+
+.thumbnail-entering-right {
+  animation: slideFromRight 0.5s forwards;
+}
+
+@keyframes slideFromBottom {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideFromTop {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideToTop {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes slideToBottom {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes slideFromLeft {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideFromRight {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
   }
 }

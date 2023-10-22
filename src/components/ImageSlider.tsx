@@ -12,15 +12,27 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   sections,
   onSectionClick,
 }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const VISIBLE_THUMBNAILS = 9;
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const VISIBLE_THUMBNAILS = 13;
   const HALF_VISIBLE_THUMBNAILS = Math.floor(VISIBLE_THUMBNAILS / 2);
 
-  const [isDragging, setIsDragging] = useState(false);
-  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
-  const [isAnimationCompleted, setAnimationCompleted] = useState(false);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [startPosition, setStartPosition] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
+  const [distanceMoved, setDistanceMoved] = useState<number>(0);
+  const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
+  const [scrollCount, setScrollCount] = useState<number>(0);
+  const [scrollDirection, setScrollDirection] = useState<"up" | "down" | null>(
+    null
+  );
+  const [refreshCounter, setRefreshCounter] = useState<number>(0);
+  const [isAnimationCompleted, setAnimationCompleted] =
+    useState<boolean>(false);
+  const [startX, setStartX] = useState<number>(0);
 
-  // References to the DOM elements for animations and interactions
+  // References to DOM elements for animations and interactions
   const mainImageRef = useRef<HTMLImageElement>(null);
   const thumbnailsRef = useRef<HTMLDivElement>(null);
   const counterRef = useRef<HTMLDivElement>(null);
@@ -41,13 +53,19 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
    */
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true);
+    setIsMouseDown(true);
     setStartPosition({ x: event.clientX, y: event.clientY });
+    setStartX(event.clientX);
   };
 
   /**
    * Resets the drag state when the mouse is released.
    */
-  const handleMouseUp = () => setIsDragging(false);
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    setIsMouseDown(false);
+    setDistanceMoved(0);
+  };
 
   /**
    * Handles the dragging movement, calculating the new active image index based on the movement.
@@ -55,17 +73,27 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging) return;
 
-    const current = window.innerWidth < 1400 ? event.clientX : event.clientY;
-    const diff = startPosition.x - current;
-    const skipCount =
-      window.innerWidth < 1400
-        ? Math.round(diff / 116)
-        : Math.round(diff / 100);
+    let diff, current;
+    if (window.innerWidth < 1400) {
+      current = event.clientX;
+      diff = startX - current;
+    } else {
+      current = event.clientY;
+      diff = startPosition.y - current;
+    }
 
-    if (skipCount) {
+    const threshold = window.innerWidth < 1400 ? 116 : 100;
+    const skipCount = Math.round(diff / threshold);
+
+    if (Math.abs(diff) >= threshold) {
       const newIndex = (activeIndex + skipCount) % images.length;
       setActiveIndex(newIndex < 0 ? images.length + newIndex : newIndex);
-      setStartPosition((prev) => ({ ...prev, x: current }));
+
+      // Resetoi aloitusasema
+      setStartPosition({ x: current, y: event.clientY });
+      setStartX(current);
+    } else {
+      setDistanceMoved(diff);
     }
   };
 
@@ -79,6 +107,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
    */
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
     setIsDragging(true);
+    setIsMouseDown(true);
     setStartPosition({
       x: event.touches[0].clientX,
       y: event.touches[0].clientY,
@@ -88,28 +117,37 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   /**
    * Resets the drag state when touch ends.
    */
-  const handleTouchEnd = () => setIsDragging(false);
-
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    setIsMouseDown(false);
+    setDistanceMoved(0);
+  };
   /**
    * Same as handleMouseMove, but for touch events.
    */
   const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
     if (!isDragging) return;
+    event.preventDefault();
+    let diff, current;
+    if (window.innerWidth < 1400) {
+      current = event.touches[0].clientX;
+      diff = startPosition.x - current;
+    } else {
+      current = event.touches[0].clientY;
+      diff = startPosition.y - current;
+    }
 
-    const current =
-      window.innerWidth < 1400
-        ? event.touches[0].clientX
-        : event.touches[0].clientY;
-    const diff = startPosition.x - current;
-    const skipCount =
-      window.innerWidth < 1400
-        ? Math.round(diff / 116)
-        : Math.round(diff / 100);
+    const threshold = window.innerWidth < 1400 ? 116 : 100;
+    const skipCount = Math.round(diff / threshold);
 
-    if (skipCount) {
+    if (Math.abs(diff) >= threshold) {
       const newIndex = (activeIndex + skipCount) % images.length;
       setActiveIndex(newIndex < 0 ? images.length + newIndex : newIndex);
-      setStartPosition((prev) => ({ ...prev, x: current }));
+
+      // Reset starting position
+      setStartPosition({ x: current, y: event.touches[0].clientY });
+    } else {
+      setDistanceMoved(diff);
     }
   };
 
@@ -141,6 +179,9 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       newIndex = images.length - 1;
     }
     setActiveIndex(newIndex);
+    setScrollDirection(event.deltaY > 0 ? "down" : "up");
+    setScrollCount((prev) => prev + 1);
+    setRefreshCounter((prev) => prev + 1);
   };
 
   /**
@@ -149,6 +190,16 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   useEffect(() => {
     setVisibleImages(getVisibleImages(activeIndex));
   }, [activeIndex]);
+
+  useEffect(() => {
+    if (scrollCount > 2) {
+      const timer = setTimeout(() => {
+        setScrollCount(0);
+      }, 20);
+
+      return () => clearTimeout(timer);
+    }
+  }, [scrollCount]);
 
   return (
     <div
@@ -172,8 +223,12 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       />
       <Thumbnails
         thumbnailsRef={thumbnailsRef}
+        isMouseDown={isMouseDown}
         visibleImages={visibleImages}
-        activeImage={images[activeIndex]}
+        scrollDirection={scrollDirection}
+        distanceMoved={distanceMoved}
+        refreshCounter={refreshCounter}
+        scrollCount={scrollCount}
       />
     </div>
   );

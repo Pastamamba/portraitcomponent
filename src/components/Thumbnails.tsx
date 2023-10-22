@@ -1,49 +1,82 @@
-import React, { RefObject } from "react";
-import { ImageData } from "../utils/utils";
-
-// Props interface for the Thumbnails component
-interface ThumbnailsProps {
-  thumbnailsRef: RefObject<HTMLDivElement>; // Ref for the thumbnails container
-  visibleImages: ImageData[]; // List of images to be displayed as thumbnails
-  activeImage: ImageData; // Currently selected or active image
-}
+import React, { useEffect, useState, useCallback } from "react";
+import debounce from "lodash/debounce";
+import { ThumbnailsProps } from "../utils/utils";
 
 const Thumbnails: React.FC<ThumbnailsProps> = ({
   thumbnailsRef,
   visibleImages,
-  activeImage,
+  scrollDirection,
+  refreshCounter,
+  scrollCount,
+  distanceMoved,
+  isMouseDown,
 }) => {
-  /**
-   * Compute CSS class names for a given thumbnail image.
-   *
-   * @param image - The thumbnail image data.
-   * @returns - The computed CSS class string.
-   */
-  const getThumbnailClassName = (image: ImageData) => {
+  const [randomKey, setRandomKey] = useState<number>(Math.random());
+
+  // Function to update the random key
+  const updateKey = useCallback(() => {
+    setRandomKey(Math.random());
+  }, []);
+
+  useEffect(() => {
+    // Debounce function for updating the key, based on the scroll count
+    const updateKeyWithDebounce =
+      scrollCount > 4 ? debounce(updateKey, 50) : updateKey;
+
+    updateKeyWithDebounce();
+
+    // Cleanup the debounced function when the component is unmounted
+    return () => {
+      updateKeyWithDebounce.cancel && updateKeyWithDebounce.cancel();
+    };
+  }, [refreshCounter, scrollCount, updateKey]);
+
+  // Determines the thumbnail animation class based on viewport width and scroll direction
+  const getThumbnailAnimationClass = () => {
+    if (window.innerWidth < 1400) {
+      return scrollDirection === "down"
+        ? "thumbnail-entering-right"
+        : "thumbnail-entering-left";
+    } else {
+      return scrollDirection === "down"
+        ? "thumbnail-entering-down"
+        : "thumbnail-entering-up";
+    }
+  };
+
+  // Get the CSS class names for the thumbnail images
+  const getThumbnailClassName = () => {
     const baseClass =
       "m-2 hover:opacity-75 object-contain max-w-100px thumbnail-image";
+    return `${baseClass} ${getThumbnailAnimationClass()}`;
+  };
 
-    // Add an active shadow border if the image is the currently active one
-    return image.id === activeImage.id
-      ? `${baseClass} mb-4 mt-4 shadow-border-active thumbnail-image`
-      : baseClass;
+  // CSS styles for the thumbnail's inner content
+  const innerContentStyles = {
+    transition: isMouseDown ? "" : "transform 0.3s ease-out",
+    transform:
+      window.innerWidth < 1400
+        ? `translateX(${-distanceMoved}px)`
+        : `translateY(${-distanceMoved}px)`,
   };
 
   return (
     <div
+      key={randomKey}
       ref={thumbnailsRef}
-      // Styling and layout for the thumbnail container. Adjusts based on screen size.
-      className="md:w-1/5 p-4 flex md:flex-col flex-row items-center overflow-x-hidden md:overflow-y-hidden hide-scrollbar slider-content max-w-100"
+      className="md:w-1/5 p-4 flex md:flex-col flex-row items-center overflow-x-hidden 
+      md:overflow-y-hidden hide-scrollbar slider-content max-w-100"
     >
-      {/* Render each thumbnail image */}
-      {visibleImages.map((image) => (
-        <img
-          key={image.id} // React list key
-          src={image.imageUrl} // Image URL
-          alt={image.category} // Alt text based on image category
-          className={`${getThumbnailClassName(image)}`} // Assign dynamic class
-        />
-      ))}
+      <div className="inner-content" style={innerContentStyles}>
+        {visibleImages.map((image) => (
+          <img
+            key={image.id}
+            src={image.imageUrl}
+            alt={image.category}
+            className={getThumbnailClassName()}
+          />
+        ))}
+      </div>
     </div>
   );
 };

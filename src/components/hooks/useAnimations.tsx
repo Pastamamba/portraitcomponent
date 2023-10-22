@@ -44,11 +44,13 @@ const useAnimations = ({
     const thumbnailChildren = Array.from(thumbnailsRef.current?.children || []);
     if (thumbnailChildren.length > 0) {
       // Animate thumbnail children from a central position to their original positions.
-      gsap.fromTo(
-        thumbnailChildren,
-        { x: thumbnailStartingX, y: thumbnailStartingY },
-        { x: 0, y: 0, duration: 1.2 }
-      );
+      gsap
+        .fromTo(
+          thumbnailChildren,
+          { x: thumbnailStartingX, y: thumbnailStartingY },
+          { x: 0, y: 0, duration: 1.2 }
+        )
+        .invalidate();
     }
 
     // Animate the main image to appear and scale up.

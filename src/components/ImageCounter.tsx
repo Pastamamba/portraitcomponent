@@ -1,12 +1,5 @@
-import React, { RefObject } from "react";
-
-// Define the properties for the ImageCounter component
-interface ImageCounterProps {
-  counterRef: RefObject<HTMLDivElement>; // Reference to the main counter container
-  counterNumberRef: RefObject<HTMLDivElement>; // Reference to the current image number container
-  activeIndex: number; // Current active image's index
-  totalImages: number; // Total number of images in the gallery
-}
+import React from "react";
+import { ImageCounterProps } from "../utils/utils";
 
 /**
  * ImageCounter Component

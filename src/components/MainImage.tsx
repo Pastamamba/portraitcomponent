@@ -1,10 +1,5 @@
-import React, { RefObject } from "react";
-import { ImageData } from "../utils/utils";
-
-interface MainImageProps {
-  mainImageRef: RefObject<HTMLImageElement>;
-  image: ImageData;
-}
+import React from "react";
+import { MainImageProps } from "../utils/utils";
 
 const MainImage: React.FC<MainImageProps> = ({ mainImageRef, image }) => (
   <div className="flex justify-center items-center w-full md:w-3/5 p-4 large-image-div">
