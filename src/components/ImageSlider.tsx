@@ -38,7 +38,9 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const counterRef = useRef<HTMLDivElement>(null);
   const counterNumberRef = useRef<HTMLDivElement>(null);
 
-  const [currentImageWidth, setCurrentImageWidth] = useState<number | null>(null);
+  const [currentImageWidth, setCurrentImageWidth] = useState<number | null>(
+    null
+  );
   const [prevImageWidth, setPrevImageWidth] = useState<number | null>(null);
 
   useAnimations({
@@ -170,38 +172,49 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     getVisibleImages(activeIndex)
   );
 
-  /**
-   * Handles the change in active image index based on the scroll direction.
-   */
-  const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
-    if (!isAnimationCompleted) return;
+  let deltaYAccumulator = 0;
+  const THRESHOLD = 100;
 
+  const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
     const isTouchpad = Math.abs(event.deltaY) < 50;
 
-    let newIndex;
+    if (!isAnimationCompleted) return;
+
     if (isTouchpad) {
-      if (Math.abs(event.deltaY) > 2) {
-        newIndex =
-            event.deltaY > 0
-                ? (activeIndex + 1) % images.length
-                : (activeIndex - 1) % images.length;
-      } else {
-        return;
+      deltaYAccumulator += event.deltaY;
+
+      if (Math.abs(deltaYAccumulator) >= THRESHOLD) {
+        let newIndex =
+          deltaYAccumulator > 0
+            ? (activeIndex + 1) % images.length
+            : (activeIndex - 1) % images.length;
+
+        if (newIndex < 0) {
+          newIndex = images.length - 1;
+        }
+
+        setActiveIndex(newIndex);
+        setScrollDirection(deltaYAccumulator > 0 ? "down" : "up");
+        setScrollCount((prev) => prev + 1);
+        setRefreshCounter((prev) => prev + 1);
+
+        deltaYAccumulator = 0;
       }
     } else {
-      newIndex =
-          event.deltaY > 0
-              ? (activeIndex + 1) % images.length
-              : (activeIndex - 1) % images.length;
-    }
+      let newIndex =
+        event.deltaY > 0
+          ? (activeIndex + 1) % images.length
+          : (activeIndex - 1) % images.length;
 
-    if (newIndex < 0) {
-      newIndex = images.length - 1;
+      if (newIndex < 0) {
+        newIndex = images.length - 1;
+      }
+
+      setActiveIndex(newIndex);
+      setScrollDirection(event.deltaY > 0 ? "down" : "up");
+      setScrollCount((prev) => prev + 1);
+      setRefreshCounter((prev) => prev + 1);
     }
-    setActiveIndex(newIndex);
-    setScrollDirection(event.deltaY > 0 ? "down" : "up");
-    setScrollCount((prev) => prev + 1);
-    setRefreshCounter((prev) => prev + 1);
   };
 
   /**
@@ -236,11 +249,11 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     >
       <Sections sections={sections} onSectionClick={onSectionClick} />
       <MainImage
-          mainImageRef={mainImageRef}
-          image={{
-            ...images[activeIndex],
-            onWidthChange: (width: number) => setCurrentImageWidth(width)
-          }}
+        mainImageRef={mainImageRef}
+        image={{
+          ...images[activeIndex],
+          onWidthChange: (width: number) => setCurrentImageWidth(width),
+        }}
       />
       <ImageCounter
         counterRef={counterRef}
