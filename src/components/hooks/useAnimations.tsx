@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, {useEffect} from "react";
 import gsap from "gsap";
 import { ImageData } from "../../utils/utils";
 
@@ -10,6 +10,8 @@ interface UseAnimationsProps {
   counterNumberRef: React.RefObject<HTMLDivElement>;
   setAnimationCompleted: (completed: boolean) => void;
   activeIndex: number;
+  currentImageWidth: number | null;
+  prevImageWidth: number | null;
 }
 
 /**
@@ -25,23 +27,61 @@ const useAnimations = ({
   counterNumberRef,
   setAnimationCompleted,
   activeIndex,
+                         currentImageWidth,
+                         prevImageWidth,
 }: UseAnimationsProps) => {
+  /**
+   * Effect to animate the main image (zoom in/out) whenever the active image index changes.
+   */
+  useEffect(() => {
+    if (mainImageRef.current) {
+      if (currentImageWidth && prevImageWidth) {
+        if (currentImageWidth > prevImageWidth) {
+          gsap.fromTo(
+              mainImageRef.current,
+              {
+                scale: 0.6,
+              },
+              {
+                scale: 1,
+                duration: 0.5,
+                ease: "power3.out",
+              }
+          );
+        } else if (currentImageWidth < prevImageWidth) {
+          gsap.fromTo(
+              mainImageRef.current,
+              {
+                scale: 1.2,
+              },
+              {
+                scale: 1,
+                duration: 0.5,
+                ease: "power3.out",
+              }
+          );
+        }
+      }
+    }
+  }, [activeIndex, images, mainImageRef, currentImageWidth, prevImageWidth]);
+
   /**
    * Effect responsible for initializing and cleaning up the main animations.
    * It animates the main image, thumbnails and counter on component mount.
    * When the component is unmounted, it will also cleanup any active GSAP tweens.
    */
   useEffect(() => {
+
     const centerScreenX = window.innerWidth / 2;
     const centerScreenY = window.innerHeight / 2;
 
     const thumbnailStartingX =
-      centerScreenX - (thumbnailsRef.current?.offsetWidth || 0) / 2;
+      centerScreenX - (thumbnailsRef.current?.offsetWidth ?? 0) / 2;
     const thumbnailStartingY =
-      centerScreenY - (thumbnailsRef.current?.offsetHeight || 0) / 2;
+      centerScreenY - (thumbnailsRef.current?.offsetHeight ?? 0) / 2;
 
     // Convert the HTMLCollection to an array and check if it's non-empty.
-    const thumbnailChildren = Array.from(thumbnailsRef.current?.children || []);
+    const thumbnailChildren = Array.from(thumbnailsRef.current?.children ?? []);
     if (thumbnailChildren.length > 0) {
       // Animate thumbnail children from a central position to their original positions.
       gsap
@@ -54,7 +94,7 @@ const useAnimations = ({
     }
 
     // Animate the main image to appear and scale up.
-    gsap.to(mainImageRef.current!, {
+    gsap.to(mainImageRef.current, {
       scale: 1,
       autoAlpha: 1,
       duration: 1,
@@ -63,7 +103,7 @@ const useAnimations = ({
 
     // Fade in and scale up the counter, then set animation completed.
     gsap
-      .from(counterRef.current!, {
+      .from(counterRef.current, {
         autoAlpha: 1,
         scale: 1,
         ease: "back.out(1.7)",
@@ -75,8 +115,11 @@ const useAnimations = ({
 
     // Cleanup function to kill GSAP tweens on component unmount.
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       if (mainImageRef.current) gsap.killTweensOf(mainImageRef.current);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       if (thumbnailsRef.current) gsap.killTweensOf(thumbnailsRef.current);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       if (counterRef.current) gsap.killTweensOf(counterRef.current);
     };
   }, [counterRef, images, mainImageRef, setAnimationCompleted, thumbnailsRef]);

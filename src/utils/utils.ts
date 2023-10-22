@@ -5,6 +5,7 @@ export interface ImageData {
   imageUrl: string;
   photographer: string;
   category: string;
+  onWidthChange?: (width: number) => void;
 }
 
 // Define the props for the ImageSlider component

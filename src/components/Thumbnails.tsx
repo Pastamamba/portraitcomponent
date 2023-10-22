@@ -64,7 +64,7 @@ const Thumbnails: React.FC<ThumbnailsProps> = ({
     <div
       key={randomKey}
       ref={thumbnailsRef}
-      className="md:w-1/5 p-4 flex md:flex-col flex-row items-center overflow-x-hidden 
+      className="md:w-1/5 p-4 flex md:flex-col flex-row items-center overflow-x-hidden
       md:overflow-y-hidden hide-scrollbar slider-content max-w-100"
     >
       <div className="inner-content" style={innerContentStyles}>

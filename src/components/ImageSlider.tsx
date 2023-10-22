@@ -38,6 +38,9 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const counterRef = useRef<HTMLDivElement>(null);
   const counterNumberRef = useRef<HTMLDivElement>(null);
 
+  const [currentImageWidth, setCurrentImageWidth] = useState<number | null>(null);
+  const [prevImageWidth, setPrevImageWidth] = useState<number | null>(null);
+
   useAnimations({
     images,
     mainImageRef,
@@ -46,6 +49,8 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     counterNumberRef,
     setAnimationCompleted,
     activeIndex,
+    currentImageWidth,
+    prevImageWidth,
   });
 
   /**
@@ -89,7 +94,6 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       const newIndex = (activeIndex + skipCount) % images.length;
       setActiveIndex(newIndex < 0 ? images.length + newIndex : newIndex);
 
-      // Resetoi aloitusasema
       setStartPosition({ x: current, y: event.clientY });
       setStartX(current);
     } else {
@@ -171,10 +175,26 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
    */
   const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
     if (!isAnimationCompleted) return;
-    let newIndex =
-      event.deltaY > 0
-        ? (activeIndex + 1) % images.length
-        : (activeIndex - 1) % images.length;
+
+    const isTouchpad = Math.abs(event.deltaY) < 50;
+
+    let newIndex;
+    if (isTouchpad) {
+      if (Math.abs(event.deltaY) > 2) {
+        newIndex =
+            event.deltaY > 0
+                ? (activeIndex + 1) % images.length
+                : (activeIndex - 1) % images.length;
+      } else {
+        return;
+      }
+    } else {
+      newIndex =
+          event.deltaY > 0
+              ? (activeIndex + 1) % images.length
+              : (activeIndex - 1) % images.length;
+    }
+
     if (newIndex < 0) {
       newIndex = images.length - 1;
     }
@@ -189,6 +209,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
    */
   useEffect(() => {
     setVisibleImages(getVisibleImages(activeIndex));
+    setPrevImageWidth(currentImageWidth);
   }, [activeIndex]);
 
   useEffect(() => {
@@ -214,7 +235,13 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       onTouchMove={handleTouchMove}
     >
       <Sections sections={sections} onSectionClick={onSectionClick} />
-      <MainImage mainImageRef={mainImageRef} image={images[activeIndex]} />
+      <MainImage
+          mainImageRef={mainImageRef}
+          image={{
+            ...images[activeIndex],
+            onWidthChange: (width: number) => setCurrentImageWidth(width)
+          }}
+      />
       <ImageCounter
         counterRef={counterRef}
         counterNumberRef={counterNumberRef}
