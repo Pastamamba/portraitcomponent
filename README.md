@@ -55,15 +55,3 @@ Contributions are welcome! If you have suggestions or bug fixes, please open an 
 
 License
 This project is licensed under the MIT License.
-
-
----
-
-**Git Repository Description**
-
-> *Portrait Component – A dynamic, responsive, and animated image slider component built with React, Vite, and GSAP.*
-
-Feel free to adjust the URLs and any additional details to match your repository and preferences.
-
-
-
