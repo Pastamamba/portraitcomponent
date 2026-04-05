@@ -5,7 +5,9 @@ import Thumbnails from "./Thumbnails";
 import ImageCounter from "./ImageCounter";
 import MainImage from "./MainImage";
 import Sections from "./Sections";
+import FullscreenOverlay from "./FullscreenOverlay";
 import useAnimations from "./hooks/useAnimations";
+import { useProFeature } from "../license";
 import {
   VISIBLE_THUMBNAILS,
   HALF_VISIBLE_THUMBNAILS,
@@ -23,6 +25,8 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   sections,
   onSectionClick,
 }) => {
+  const isPro = useProFeature();
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -243,6 +247,42 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     }
   }, [scrollCount]);
 
+  /**
+   * Pro Feature: Keyboard navigation with arrow keys.
+   * ArrowRight/ArrowDown advances to the next image.
+   * ArrowLeft/ArrowUp goes to the previous image.
+   */
+  useEffect(() => {
+    if (!isPro) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isFullscreen) return; // handled by FullscreenOverlay
+
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev + 1) % images.length);
+        setScrollDirection("down");
+        setRefreshCounter((prev) => prev + 1);
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIndex((prev) =>
+          prev - 1 < 0 ? images.length - 1 : prev - 1
+        );
+        setScrollDirection("up");
+        setRefreshCounter((prev) => prev + 1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isPro, images.length, isFullscreen]);
+
+  const handleMainImageClick = useCallback(() => {
+    if (isPro) {
+      setIsFullscreen(true);
+    }
+  }, [isPro]);
+
   return (
     <div
       className="flex md:flex-row flex-col image-slider-body"
@@ -265,6 +305,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
           ...images[activeIndex],
           onWidthChange: (width: number) => setCurrentImageWidth(width),
         }}
+        onClick={handleMainImageClick}
       />
       <ImageCounter
         counterRef={counterRef}
@@ -280,6 +321,12 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
         distanceMoved={distanceMoved}
         refreshCounter={refreshCounter}
         scrollCount={scrollCount}
+      />
+      <FullscreenOverlay
+        imageUrl={images[activeIndex].imageUrl}
+        alt={images[activeIndex].category}
+        isOpen={isFullscreen}
+        onClose={() => setIsFullscreen(false)}
       />
     </div>
   );

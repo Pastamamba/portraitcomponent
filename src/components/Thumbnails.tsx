@@ -8,7 +8,7 @@ import {
   IMAGE_FALLBACK_SRC,
 } from "../constants";
 
-const Thumbnails: React.FC<ThumbnailsProps> = ({
+const ThumbnailsComponent: React.FC<ThumbnailsProps> = ({
   thumbnailsRef,
   visibleImages,
   scrollDirection,
@@ -17,15 +17,13 @@ const Thumbnails: React.FC<ThumbnailsProps> = ({
   distanceMoved,
   isMouseDown,
 }) => {
-  const [randomKey, setRandomKey] = useState<number>(Math.random());
+  const [refreshKey, setRefreshKey] = useState<number>(0);
 
-  // Function to update the random key
   const updateKey = useCallback(() => {
-    setRandomKey(Math.random());
+    setRefreshKey((prev) => prev + 1);
   }, []);
 
   useEffect(() => {
-    // Debounce function for updating the key, based on the scroll count
     if (scrollCount > SCROLL_DEBOUNCE_THRESHOLD) {
       const debouncedUpdate = debounce(updateKey, SCROLL_DEBOUNCE_DELAY);
       debouncedUpdate();
@@ -37,7 +35,6 @@ const Thumbnails: React.FC<ThumbnailsProps> = ({
     }
   }, [refreshCounter, scrollCount, updateKey]);
 
-  // Determines the thumbnail animation class based on viewport width and scroll direction
   const getThumbnailAnimationClass = () => {
     if (window.innerWidth < LAYOUT_BREAKPOINT) {
       return scrollDirection === "down"
@@ -50,14 +47,12 @@ const Thumbnails: React.FC<ThumbnailsProps> = ({
     }
   };
 
-  // Get the CSS class names for the thumbnail images
   const getThumbnailClassName = () => {
     const baseClass =
       "m-2 hover:opacity-75 object-contain max-w-100px thumbnail-image";
     return `${baseClass} ${getThumbnailAnimationClass()}`;
   };
 
-  // CSS styles for the thumbnail's inner content
   const innerContentStyles = {
     transition: isMouseDown ? "" : "transform 0.3s ease-out",
     transform:
@@ -72,7 +67,7 @@ const Thumbnails: React.FC<ThumbnailsProps> = ({
 
   return (
     <div
-      key={randomKey}
+      key={refreshKey}
       ref={thumbnailsRef}
       className="md:w-1/5 p-4 flex md:flex-col flex-row items-center overflow-x-hidden
       md:overflow-y-hidden hide-scrollbar slider-content max-w-100"
@@ -92,4 +87,5 @@ const Thumbnails: React.FC<ThumbnailsProps> = ({
   );
 };
 
+const Thumbnails = React.memo(ThumbnailsComponent);
 export default Thumbnails;

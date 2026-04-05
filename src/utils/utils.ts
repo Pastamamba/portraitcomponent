@@ -28,6 +28,7 @@ export interface ThumbnailsProps {
 export interface MainImageProps {
   mainImageRef: RefObject<HTMLImageElement>;
   image: ImageData;
+  onClick?: () => void;
 }
 
 // Define the properties for the ImageCounter component
