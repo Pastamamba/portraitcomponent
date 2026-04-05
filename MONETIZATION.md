@@ -7,7 +7,8 @@ This document outlines actionable monetization use cases for the Portrait Compon
 ## 1. NPM Package — Freemium Model
 
 **Effort:** Low  
-**Revenue model:** Free core + paid premium features
+**Revenue model:** Free core + paid premium features  
+**Status:** ✅ Infrastructure implemented
 
 ### How it works
 - Publish the core image slider as a **free, open-source npm package**.
@@ -20,18 +21,20 @@ This document outlines actionable monetization use cases for the Portrait Compon
 - Standard GSAP animations
 
 ### Pro tier includes ($29–$99 one-time or $9/mo)
+- ✅ Built-in lightbox/fullscreen mode
+- ✅ Keyboard navigation (Arrow keys)
 - Advanced animation presets (parallax, 3D transforms, ken burns effect)
-- Built-in lightbox/fullscreen mode
 - Watermark overlay support for photographers
 - Analytics integration (track which images get the most views)
 - Priority support and bug fixes
 - Custom theme builder
 
 ### Implementation
-1. Set `"private": false` in `package.json`
-2. Create a Vite library build configuration
-3. Add a license check module that unlocks pro features
-4. Publish to npm: `npm publish`
+1. ✅ Set `"private": false` in `package.json`
+2. ✅ Create a Vite library build configuration (ES + CJS outputs)
+3. ✅ Add a license check module (`LicenseProvider`) that unlocks pro features
+4. ✅ Create library entry point (`src/index.ts`) with all public exports
+5. Publish to npm: `npm publish`
 
 ---
 
@@ -132,10 +135,11 @@ Create themed variants of the component and sell them on template marketplaces.
 ## 6. Sponsorship & Open Source Funding
 
 **Effort:** Low  
-**Revenue model:** Recurring donations
+**Revenue model:** Recurring donations  
+**Status:** ✅ GitHub Sponsors configured
 
 ### Platforms
-- [GitHub Sponsors](https://github.com/sponsors)
+- ✅ [GitHub Sponsors](https://github.com/sponsors) — `.github/FUNDING.yml` configured
 - [Open Collective](https://opencollective.com/)
 - [Buy Me a Coffee](https://buymeacoffee.com/)
 - [Patreon](https://www.patreon.com/)
