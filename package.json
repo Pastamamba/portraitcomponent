@@ -2,6 +2,21 @@
   "name": "portraitcomponent",
   "private": true,
   "version": "0.0.0",
+  "description": "A dynamic and responsive React image slider component with GSAP animations, section-based navigation, and drag/touch interactions — ideal for photographer portfolios and image galleries.",
+  "keywords": [
+    "react",
+    "image-slider",
+    "portrait",
+    "gallery",
+    "gsap",
+    "animation",
+    "carousel",
+    "photographer",
+    "portfolio",
+    "responsive",
+    "typescript"
+  ],
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,11 +28,10 @@
     "gsap": "^3.12.2",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-draggable": "^4.4.6",
-    "react-slick": "^0.29.0"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.24",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",

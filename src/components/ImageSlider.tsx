@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import "./imageSlider.css";
 import { ImageData, ImageSliderProps } from "../utils/utils";
 import Thumbnails from "./Thumbnails";
@@ -6,6 +6,17 @@ import ImageCounter from "./ImageCounter";
 import MainImage from "./MainImage";
 import Sections from "./Sections";
 import useAnimations from "./hooks/useAnimations";
+import {
+  VISIBLE_THUMBNAILS,
+  HALF_VISIBLE_THUMBNAILS,
+  LAYOUT_BREAKPOINT,
+  DRAG_THRESHOLD_DESKTOP,
+  DRAG_THRESHOLD_MOBILE,
+  SCROLL_THRESHOLD,
+  TOUCHPAD_DELTA_LIMIT,
+  SCROLL_COUNT_RESET_DELAY,
+  SCROLL_COUNT_RESET_TRIGGER,
+} from "../constants";
 
 const ImageSlider: React.FC<ImageSliderProps> = ({
   images,
@@ -13,8 +24,6 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   onSectionClick,
 }) => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
-  const VISIBLE_THUMBNAILS = 13;
-  const HALF_VISIBLE_THUMBNAILS = Math.floor(VISIBLE_THUMBNAILS / 2);
 
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [startPosition, setStartPosition] = useState<{ x: number; y: number }>({
@@ -81,7 +90,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     if (!isDragging) return;
 
     let diff, current;
-    if (window.innerWidth < 1400) {
+    if (window.innerWidth < LAYOUT_BREAKPOINT) {
       current = event.clientX;
       diff = startX - current;
     } else {
@@ -89,7 +98,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       diff = startPosition.y - current;
     }
 
-    const threshold = window.innerWidth < 1400 ? 116 : 100;
+    const threshold = window.innerWidth < LAYOUT_BREAKPOINT ? DRAG_THRESHOLD_MOBILE : DRAG_THRESHOLD_DESKTOP;
     const skipCount = Math.round(diff / threshold);
 
     if (Math.abs(diff) >= threshold) {
@@ -135,7 +144,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     if (!isDragging) return;
     event.preventDefault();
     let diff, current;
-    if (window.innerWidth < 1400) {
+    if (window.innerWidth < LAYOUT_BREAKPOINT) {
       current = event.touches[0].clientX;
       diff = startPosition.x - current;
     } else {
@@ -143,7 +152,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       diff = startPosition.y - current;
     }
 
-    const threshold = window.innerWidth < 1400 ? 116 : 100;
+    const threshold = window.innerWidth < LAYOUT_BREAKPOINT ? DRAG_THRESHOLD_MOBILE : DRAG_THRESHOLD_DESKTOP;
     const skipCount = Math.round(diff / threshold);
 
     if (Math.abs(diff) >= threshold) {
@@ -160,32 +169,31 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   /**
    * Returns a subset of images centered around the given index, for displaying as visible thumbnails.
    */
-  const getVisibleImages = (index: number): ImageData[] => {
+  const getVisibleImages = useCallback((index: number): ImageData[] => {
     const start = index - HALF_VISIBLE_THUMBNAILS;
     return Array.from(
       { length: VISIBLE_THUMBNAILS },
       (_, i) => images[(start + i + images.length) % images.length]
     );
-  };
+  }, [images]);
 
   const [visibleImages, setVisibleImages] = useState(
     getVisibleImages(activeIndex)
   );
 
-  let deltaYAccumulator = 0;
-  const THRESHOLD = 100;
+  const deltaYAccumulatorRef = useRef<number>(0);
 
   const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
-    const isTouchpad = Math.abs(event.deltaY) < 50;
+    const isTouchpad = Math.abs(event.deltaY) < TOUCHPAD_DELTA_LIMIT;
 
     if (!isAnimationCompleted) return;
 
     if (isTouchpad) {
-      deltaYAccumulator += event.deltaY;
+      deltaYAccumulatorRef.current += event.deltaY;
 
-      if (Math.abs(deltaYAccumulator) >= THRESHOLD) {
+      if (Math.abs(deltaYAccumulatorRef.current) >= SCROLL_THRESHOLD) {
         let newIndex =
-          deltaYAccumulator > 0
+          deltaYAccumulatorRef.current > 0
             ? (activeIndex + 1) % images.length
             : (activeIndex - 1) % images.length;
 
@@ -194,11 +202,11 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
         }
 
         setActiveIndex(newIndex);
-        setScrollDirection(deltaYAccumulator > 0 ? "down" : "up");
+        setScrollDirection(deltaYAccumulatorRef.current > 0 ? "down" : "up");
         setScrollCount((prev) => prev + 1);
         setRefreshCounter((prev) => prev + 1);
 
-        deltaYAccumulator = 0;
+        deltaYAccumulatorRef.current = 0;
       }
     } else {
       let newIndex =
@@ -223,13 +231,13 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   useEffect(() => {
     setVisibleImages(getVisibleImages(activeIndex));
     setPrevImageWidth(currentImageWidth);
-  }, [activeIndex]);
+  }, [activeIndex, currentImageWidth, getVisibleImages]);
 
   useEffect(() => {
-    if (scrollCount > 2) {
+    if (scrollCount > SCROLL_COUNT_RESET_TRIGGER) {
       const timer = setTimeout(() => {
         setScrollCount(0);
-      }, 20);
+      }, SCROLL_COUNT_RESET_DELAY);
 
       return () => clearTimeout(timer);
     }
@@ -238,6 +246,9 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   return (
     <div
       className="flex md:flex-row flex-col image-slider-body"
+      role="region"
+      aria-label="Image gallery"
+      aria-roledescription="carousel"
       onWheel={handleScroll}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}

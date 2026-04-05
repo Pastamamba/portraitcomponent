@@ -9,6 +9,8 @@ A dynamic and responsive portrait component featuring an animated image slider w
 - **Interactive Image Slider**: Displays images with a dynamic header, counter, and draggable thumbnails.
 - **Section-Based Navigation**: Easily switch between different image datasets.
 - **Modern Styling**: Built with Tailwind CSS for a clean, utility-first approach.
+- **Error Handling**: Graceful fallback when images fail to load.
+- **Accessible**: ARIA labels, keyboard navigation, and semantic markup.
 
 ## Technologies
 
@@ -33,25 +35,37 @@ Install the dependencies:
 ```bash
 npm install
 ```
-Development
+
+## Development
+
 Start the development server:
 ```bash
 npm run dev
 ```
 Then, open your browser and navigate to the provided local URL.
 
-Project Structure
+## Project Structure
+```
 src/
-components/: Contains all React components (e.g., Header, ImageSlider, MainImage, Thumbnails, Sections).
-hooks/: Custom hooks (e.g., useAnimations for GSAP-powered animations).
-utils/: Utility functions and TypeScript types.
-mockData.ts: Sample image data for development and testing.
-public/: Public assets and static files.
-Customization
-The modular structure allows you to easily integrate and customize the component to fit your needs. Feel free to tweak the styles, animations, or component logic.
+├── components/     React components (Header, ImageSlider, MainImage, Thumbnails, Sections)
+│   └── hooks/      Custom hooks (useAnimations for GSAP-powered animations)
+├── utils/          Utility functions and TypeScript types
+├── constants.ts    Centralized configuration constants
+└── mockData.ts     Sample image data for development and testing
+public/             Public assets and static files
+```
 
-Contributing
+## Customization
+The modular structure allows you to easily integrate and customize the component to fit your needs. Feel free to tweak the styles, animations, or component logic. Key thresholds and constants are centralized in `src/constants.ts` for easy adjustment.
+
+## Roadmap & Improvements
+See [IMPROVEMENTS.md](./IMPROVEMENTS.md) for a detailed list of identified improvement areas including testing, state management, accessibility, and performance.
+
+## Monetization
+See [MONETIZATION.md](./MONETIZATION.md) for a comprehensive guide on monetization strategies — from npm publishing and template marketplaces to SaaS platforms and consulting.
+
+## Contributing
 Contributions are welcome! If you have suggestions or bug fixes, please open an issue or submit a pull request.
 
-License
+## License
 This project is licensed under the MIT License.
