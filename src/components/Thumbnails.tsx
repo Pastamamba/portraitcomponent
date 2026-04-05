@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import debounce from "lodash/debounce";
 import { ThumbnailsProps } from "../utils/utils";
+import {
+  LAYOUT_BREAKPOINT,
+  SCROLL_DEBOUNCE_THRESHOLD,
+  SCROLL_DEBOUNCE_DELAY,
+  IMAGE_FALLBACK_SRC,
+} from "../constants";
 
 const Thumbnails: React.FC<ThumbnailsProps> = ({
   thumbnailsRef,
@@ -20,20 +26,20 @@ const Thumbnails: React.FC<ThumbnailsProps> = ({
 
   useEffect(() => {
     // Debounce function for updating the key, based on the scroll count
-    const updateKeyWithDebounce =
-      scrollCount > 4 ? debounce(updateKey, 50) : updateKey;
-
-    updateKeyWithDebounce();
-
-    // Cleanup the debounced function when the component is unmounted
-    return () => {
-      updateKeyWithDebounce.cancel && updateKeyWithDebounce.cancel();
-    };
+    if (scrollCount > SCROLL_DEBOUNCE_THRESHOLD) {
+      const debouncedUpdate = debounce(updateKey, SCROLL_DEBOUNCE_DELAY);
+      debouncedUpdate();
+      return () => {
+        debouncedUpdate.cancel();
+      };
+    } else {
+      updateKey();
+    }
   }, [refreshCounter, scrollCount, updateKey]);
 
   // Determines the thumbnail animation class based on viewport width and scroll direction
   const getThumbnailAnimationClass = () => {
-    if (window.innerWidth < 1400) {
+    if (window.innerWidth < LAYOUT_BREAKPOINT) {
       return scrollDirection === "down"
         ? "thumbnail-entering-right"
         : "thumbnail-entering-left";
@@ -55,9 +61,13 @@ const Thumbnails: React.FC<ThumbnailsProps> = ({
   const innerContentStyles = {
     transition: isMouseDown ? "" : "transform 0.3s ease-out",
     transform:
-      window.innerWidth < 1400
+      window.innerWidth < LAYOUT_BREAKPOINT
         ? `translateX(${-distanceMoved}px)`
         : `translateY(${-distanceMoved}px)`,
+  };
+
+  const handleThumbnailError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = IMAGE_FALLBACK_SRC;
   };
 
   return (
@@ -73,6 +83,7 @@ const Thumbnails: React.FC<ThumbnailsProps> = ({
             key={image.id}
             src={image.imageUrl}
             alt={image.category}
+            onError={handleThumbnailError}
             className={getThumbnailClassName()}
           />
         ))}
