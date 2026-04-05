@@ -6,7 +6,6 @@ const Sections: React.FC<
 > = ({ sections, onSectionClick }) => (
   <nav
     className="w-1/5 md:w-1/4 text-white p-4 section-title"
-    role="navigation"
     aria-label="Image gallery sections"
   >
     {sections.map((section, index) => (
