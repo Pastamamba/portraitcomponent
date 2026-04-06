@@ -42,7 +42,8 @@ This document outlines identified improvement areas for the Portrait Component, 
 
 - ✅ Added `role`, `aria-label`, `tabIndex`, and keyboard handlers to `Sections`.
 - ✅ Added `aria-roledescription="carousel"` to the slider container.
-- Add keyboard navigation (Arrow keys) to browse images.
+- ✅ Added keyboard navigation (Arrow keys) to browse images (Pro feature).
+- ✅ Added accessible fullscreen lightbox with Escape-to-close and ARIA attributes (Pro feature).
 - Add `aria-live` region to announce image changes to screen readers.
 - Ensure sufficient color contrast ratios.
 
@@ -71,16 +72,20 @@ This document outlines identified improvement areas for the Portrait Component, 
 ## Low Priority / Future Enhancements
 
 ### 8. Performance Optimization
-- Add `React.memo` to `Thumbnails`, `MainImage`, and `ImageCounter` to prevent unnecessary re-renders.
-- Replace `Math.random()` key in `Thumbnails` with a deterministic key to avoid full DOM remounts.
+- ✅ Added `React.memo` to `Thumbnails`, `MainImage`, and `ImageCounter` to prevent unnecessary re-renders.
+- ✅ Replaced `Math.random()` key in `Thumbnails` with a deterministic counter to avoid full DOM remounts.
 - Use `will-change: transform` CSS property for animated elements.
 - Consider `IntersectionObserver` for lazy-loading off-screen thumbnails.
 
 ### 9. NPM Package Publishing
-- Set `"private": false` and add `"main"` / `"module"` / `"types"` fields to `package.json`.
-- Create a Vite library build configuration.
-- Add `peerDependencies` for `react` and `react-dom`.
-- Publish to npm as a reusable component.
+**Status:** ✅ Implemented
+- ✅ Set `"private": false` and added `"main"` / `"module"` / `"types"` / `"exports"` fields to `package.json`.
+- ✅ Created a Vite library build configuration (ES + CJS outputs).
+- ✅ Added `peerDependencies` for `react` and `react-dom`.
+- ✅ Created library entry point (`src/index.ts`) exporting all public API.
+- ✅ Added `"files"` field to control published package contents.
+- ✅ Added repository, homepage, bugs, and funding metadata.
+- Publish to npm as a reusable component (`npm publish`).
 
 ### 10. Documentation
 - Add JSDoc comments to all exported interfaces and components.

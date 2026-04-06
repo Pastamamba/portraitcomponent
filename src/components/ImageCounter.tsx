@@ -14,7 +14,7 @@ import { ImageCounterProps } from "../utils/utils";
  *
  * @returns JSX element for the image counter.
  */
-const ImageCounter: React.FC<ImageCounterProps> = ({
+const ImageCounterComponent: React.FC<ImageCounterProps> = ({
   counterRef,
   counterNumberRef,
   activeIndex,
@@ -42,4 +42,5 @@ const ImageCounter: React.FC<ImageCounterProps> = ({
   </div>
 );
 
+const ImageCounter = React.memo(ImageCounterComponent);
 export default ImageCounter;

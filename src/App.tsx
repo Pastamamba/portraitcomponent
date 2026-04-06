@@ -3,6 +3,7 @@ import { mockData, mockData1 } from "./mockData.ts";
 import ImageSlider from "./components/ImageSlider.tsx";
 import { useState } from "react";
 import { ImageData } from "./utils/utils.ts";
+import { LicenseProvider } from "./license";
 
 // App component structure
 export const App = () => {
@@ -23,20 +24,22 @@ export const App = () => {
   };
 
   return (
-    <div className="bg-[#0b0b0b]">
-      {/* Display header with photographer and category details */}
-      <Header
-        photographer={currentImages[0].photographer}
-        category={currentImages[0].category}
-      />
+    <LicenseProvider>
+      <div className="bg-[#0b0b0b]">
+        {/* Display header with photographer and category details */}
+        <Header
+          photographer={currentImages[0].photographer}
+          category={currentImages[0].category}
+        />
 
-      {/* Image Slider to display images with associated sections */}
-      <ImageSlider
-        key={currentImages[0].id}
-        images={currentImages}
-        sections={sections}
-        onSectionClick={changeImagesBySection}
-      />
-    </div>
+        {/* Image Slider to display images with associated sections */}
+        <ImageSlider
+          key={currentImages[0].id}
+          images={currentImages}
+          sections={sections}
+          onSectionClick={changeImagesBySection}
+        />
+      </div>
+    </LicenseProvider>
   );
 };
